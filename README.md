@@ -25,6 +25,7 @@ This project is a GPS tracker that uses the **ESP8266 Wi-Fi module** and the **N
 
 > **Note**: Ensure the ESP8266 and GPS module are properly powered. Use a voltage regulator or level shifter if needed.  
 - Project Structure
+```
 Main Folder
 │
 ├── GMT/
@@ -36,7 +37,7 @@ Main Folder
 ├── Webpage/
 │   └── frontend/               # Frontend code for the web interface
 │   └── backend/                # Backend code for the web server
-
+```
 ---
 
 ## Installing Dependencies
