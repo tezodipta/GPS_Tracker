@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Location</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 {
+            margin: 10px 0;
+        }
+
+        #map {
+            height: 400px;
+            width: 80%;
+            margin: 20px 0;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+        }
+
+        .data-container {
+            display: flex;
+            justify-content: space-around;
+            width: 80%;
+            margin: 20px 0;
+        }
+
+        .data-box {
+            flex: 1;
+            padding: 20px;
+            margin: 5px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+
+        .data-box h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #555;
+        }
+
+        .data-box p {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 5px 0;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Live Location</h1>
+    <div id="map"></div>
+
+    <div class="data-container">
+        <div class="data-box">
+            <h2>Speed</h2>
+            <p id="speed">--</p>
+        </div>
+        <div class="data-box">
+            <h2>Altitude</h2>
+            <p id="altitude">--</p>
+        </div>
+        <div class="data-box">
+            <h2>Time</h2>
+            <p id="time">--</p>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map
+        const map = L.map('map').setView([51.505, -0.09], 13); // Default coordinates
+
+        // Set up the tile layer (OpenStreetMap in this case)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        let marker;
+
+        // Function to fetch the location data from the backend
+        function fetchLocationData() {
+            fetch('http://localhost:3000/location')
+                .then(response => response.json())
+                .then(data => {
+                    const { latitude, longitude, altitude, speed, time } = data;
+
+                    // Validate the latitude and longitude
+                    if (latitude && longitude && !isNaN(latitude) && !isNaN(longitude)) {
+                        const latLng = [latitude, longitude];
+
+                        // Set the map's view to the new location and add/update the marker
+                        map.setView(latLng, 13);
+                        if (marker) {
+                            marker.setLatLng(latLng);
+                        } else {
+                            marker = L.marker(latLng).addTo(map);
+                        }
+                        marker.bindPopup(`Latitude: ${latitude}, Longitude: ${longitude}`).openPopup();
+
+                        // Update the speed, altitude, and time data
+                        document.getElementById('speed').textContent = `${speed} km/h`;
+                        document.getElementById('altitude').textContent = `${altitude} m`;
+                        document.getElementById('time').textContent = time; // Directly display the time
+                    } else {
+                        console.log('Invalid location data received:', data);
+                    }
+                })
+                .catch(error => console.error('Error fetching location data:', error));
+        }
+
+        // Fetch location data every 10 seconds
+        setInterval(fetchLocationData, 10000);
+
+        // Initial fetch
+        fetchLocationData();
+    </script>
+</body>
+</html>
