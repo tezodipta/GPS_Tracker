@@ -92,7 +92,7 @@
 
         // Function to fetch the location data from the backend
         function fetchLocationData() {
-            fetch('http://localhost:3000/location')
+            fetch('https://gps-tracker-esp8266.onrender.com/location')
                 .then(response => response.json())
                 .then(data => {
                     const { latitude, longitude, altitude, speed, time } = data;
