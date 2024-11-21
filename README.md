@@ -77,6 +77,23 @@ Main Folder
     ```bash
     nodemon server.js
     ```
+> For ESP8266
+- Install the **Arduino IDE** from [arduino.cc](https://www.arduino.cc/en/software).
+- 1. ESP8266 Library (ESP8266WiFi, ESP8266HTTPClient, WiFiClientSecure)
+    Open Arduino IDE.
+    Go to File > Preferences.
+    Add the following URL to the Additional Board Manager URLs field:
+    ```
+    http://arduino.esp8266.com/stable/package_esp8266com_index.json
+    ```
+    Go to Tools > Board > Boards Manager.
+    Search for ESP8266 and click Install.
+    This will install the ESP8266 core along with the required libraries (ESP8266WiFi.h, ESP8266HTTPClient.h, WiFiClientSecure.h).
+- 2. TinyGPS++ Library
+    Go to Sketch > Include Library > Manage Libraries.
+    In the Library Manager, search for TinyGPS++.
+    Install the library by Mikal Hart.
+
 ### output sample
 {
   "latitude": "33.225897",
