@@ -1,43 +1,59 @@
 # GPS_Tracker
-# ESP8266 GPS Tracker with Web Interface
+# ESP8266 GPS Tracker with Web Interface and SMS Functionality
 
 ## Overview
-This project is a GPS tracker that uses the **ESP8266 Wi-Fi module** and the **NEO-6M GPS module** to gather location data like **latitude, longitude, speed, altitude**, and timestamps. The data is sent to a backend server using HTTP and displayed on a web interface.  
+This project is a GPS tracker that uses the **ESP8266 Wi-Fi module**, **NEO-6M GPS module**, and **SIM800L GSM module** to gather and transmit location data like **latitude, longitude, speed, altitude**, and timestamps. The data is sent to a backend server using HTTP, displayed on a web interface, and can also be sent via **SMS** or **missed call** to a specified phone number by triggering a button.
 
 ---
 
 ## Required Components
 1. **ESP8266 Wi-Fi Module**  
 2. **NEO-6M GPS Module**  
-3. **Connecting Wires**  
-4. **Power Supply** (3.3V for ESP8266 and 5V for GPS module)(optional)
+3. **SIM800L GSM Module**  
+4. **Connecting Wires**  
+5. **Power Supply** (3.3V for ESP8266 and 5V for GPS and GSM modules)
 
 ---
 
 ## Circuit Diagram
 ### Connections:
-| ESP8266 Pin | NEO-6M GPS Pin |
-|-------------|----------------|
-| GPIO 5      | RX             |
-| GPIO 4      | TX             |
-| VCC         | 5V             |
-| GND         | GND            |
+| ESP8266 Pin | NEO-6M GPS Pin | SIM800L Pin  |
+|-------------|----------------|--------------|
+| D1          | D1 (RX)        |              |
+| D2          | D2 (TX)        |              |
+| D3          |                | D3 (TX)      |   
+| D4          |                | D4 (RX)      | 
+| VCC         | 3V             | 3.7v Battery |
+| GND         | GND            | GND          |
 
-> **Note**: Ensure the ESP8266 and GPS module are properly powered. Use a voltage regulator or level shifter if needed.  
-- Project Structure
+>create a common ground for all the modules.
+
+> **Note**: Ensure proper power supply to all modules. Use a voltage regulator or level shifter as needed for compatibility.  
+
+---
+
+## Project Structure
+
 ```
 Main Folder
 │
+├── Final_without_pushButton/
+│   └── Final_without_pushButton.ino           # Code for sending GMT time, lat, long and location data Via sms without push button.
+|
 ├── GMT/
-│   └── gmt_code.ino           # Code for sending GMT time, lat, long, etc.
+│   └── GMT.ino                                # Code for sending GMT time, lat, long, etc to the server.
 │
 ├── IST/
-│   └── ist_code.ino           # Code for sending IST time, lat, long, etc.
+│   └── IST.ino                                # Code for sending IST time, lat, long, etc to the server.
+│
+├── sendLocation/
+│   └── sendLocation.ino                       # Code for sending GMT time, lat, long, via sms ony.
 │
 ├── Webpage/
 │   └── frontend/               # Frontend code for the web interface
 │   └── backend/                # Backend code for the web server
 ```
+
 ---
 
 ## Installing Dependencies
