@@ -7,7 +7,7 @@ app.use(cors()); // Enable CORS for all origins
 
 app.use(express.json());
 
-let locationData = { latitude: null, longitude: null };
+let locationData = { latitude: null, longitude: null, };
 
 app.post('/location', (req, res) => {
   locationData = req.body;
