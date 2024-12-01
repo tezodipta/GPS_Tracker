@@ -37,6 +37,9 @@ This project is a GPS tracker that uses the **ESP8266 Wi-Fi module**, **NEO-6M G
 ```
 Main Folder
 │
+├── Circuit_pic/
+│   └── Circuit.png                            # Circuit diagram for the project. 
+|
 ├── Final/
 │   └── Final_code.ino                         # Code for sending location data to Website and sending location Via sms by push button and Emergency calling function.
 |
@@ -93,6 +96,9 @@ Main Folder
     Go to Sketch > Include Library > Manage Libraries.
     In the Library Manager, search for TinyGPS++.
     Install the library by Mikal Hart.
+
+### Circuit Diagram
+![alt text](https://github.com/tezodipta/GPS_Tracker/blob/main/Circuit_pic/Circuit.png?raw=true)
 
 ### output sample
 {
