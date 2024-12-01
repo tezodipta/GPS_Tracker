@@ -98,7 +98,7 @@ Main Folder
     Install the library by Mikal Hart.
 
 ### Circuit Diagram
-![alt text](https://github.com/tezodipta/GPS_Tracker/blob/main/Circuit_pic/Circuit.png?raw=true)
+![Circuit image](https://github.com/tezodipta/GPS_Tracker/blob/main/Circuit_Pic/Circuit.png?raw=true)
 
 ### output sample
 {
