@@ -5,8 +5,11 @@
 #include <SoftwareSerial.h>
 
 // Wi-Fi credentials
-const char *ssid = "wifi-name";
-const char *password = "password";
+const char *ssid = "Tezodipta";
+const char *password = "ykqb6512";
+
+#define redl 15
+#define greenl 13
 
 // Server URL
 const char *serverUrl = "https://gps-tracker-esp8266.onrender.com/location"; // HTTPS API URL or IP address or server address
@@ -21,6 +24,10 @@ void setup()
 {
   Serial.begin(115200);
   ss.begin(9600); // GPS module baud rate
+  pinMode(redl, OUTPUT);
+  pinMode(greenl, OUTPUT);
+  digitalWrite(redl, HIGH);
+  digitalWrite(greenl, LOW);
 
   // Connect to Wi-Fi
   WiFi.begin(ssid, password);
@@ -33,6 +40,7 @@ void setup()
 
   // Disable SSL certificate validation (for development purposes only)
   wifiClientSecure.setInsecure();
+  digitalWrite(redl,LOW);
 }
 
 void loop()
@@ -121,8 +129,9 @@ void loop()
       {
         Serial.println("Wi-Fi disconnected!");
       }
-
+      digitalWrite(greenl,HIGH);
       delay(10000); // Send data every 10 seconds
+      digitalWrite(greenl,LOW);
     }
   }
 }

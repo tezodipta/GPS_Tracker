@@ -1,30 +1,37 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
-#include <WiFiClientSecure.h>
+#include <WiFiClient.h>
 #include <TinyGPS++.h>
 #include <SoftwareSerial.h>
 
 // Wi-Fi credentials
-const char *ssid = "wifi-name";
-const char *password = "password";
+const char *ssid = "Tezodipta";
+const char *password = "ykqb6512";
 
 // Server URL
-const char *serverUrl = "https://gps-tracker-esp8266.onrender.com/location"; // HTTPS API URL or IP address
+const char *serverUrl = "http://SERVER-IP/location"; // HTTP API URL or IP address
 
 // Phone number
-#define PHONE_NUMBER "+913001234567"
+#define PHONE_NUMBER "+91xxxxxxxxx"
 
-// Pin definitions (from the first code)
+// Pin definitions for GPS and GSM
 #define rxGPS 5 // D1
 #define txGPS 4 // D2
 SoftwareSerial neogps(rxGPS, txGPS);
 TinyGPSPlus gps;
 
+#define redl 15
+#define greenl 13
+// #define rxGSM 1 // TX
 #define rxGSM 0 // D3
 #define txGSM 2 // D4
 SoftwareSerial sim800(rxGSM, txGSM);
 
-WiFiClientSecure wifiClientSecure; // Secure client for HTTPS communication
+// Push button pin definitions
+#define BUTTON_SEND 14 // Send location button
+#define BUTTON_CALL 12 // Make call button
+
+WiFiClient wifiClient; // Simple client for HTTP communication
 
 // Global variables
 String smsStatus;
@@ -35,9 +42,14 @@ boolean DEBUG_MODE = 1;
 
 void setup()
 {
-    // Setup from the first code
+    // Setup for GPS and GSM
     Serial.begin(115200);
     Serial.println("NodeMCU USB serial initialize");
+
+    pinMode(redl, OUTPUT);
+    pinMode(greenl, OUTPUT);
+    digitalWrite(greenl, LOW);
+    digitalWrite(redl, HIGH);
 
     sim800.begin(9600);
     Serial.println("SIM800L serial initialize");
@@ -58,24 +70,55 @@ void setup()
     delay(1000);
     sim800.println("AT+CLIP=1"); // Enable Caller ID
     delay(500);
+    digitalWrite(redl, LOW); // Reset red LED
+    digitalWrite(greenl, HIGH);
+    delay(500);
+    digitalWrite(greenl, LOW);
 
-    // Setup from the second code
-    // Connect to Wi-Fi
+    // Wi-Fi setup
     WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED)
-    {
-        delay(1000);
-        Serial.println("Connecting...");
-    }
-    Serial.println("Connected to Wi-Fi!");
 
-    // Disable SSL certificate validation (for development purposes only)
-    wifiClientSecure.setInsecure();
+    bool connected = false;
+    for (int attempts = 0; attempts < 15; attempts++)
+    {
+        digitalWrite(redl, HIGH);
+        if (WiFi.status() == WL_CONNECTED)
+        {
+            connected = true;
+            digitalWrite(redl, LOW);
+            break;
+        }
+        delay(500);
+        Serial.println("Connecting...");
+        digitalWrite(redl, LOW);
+        delay(500);
+    }
+
+    if (connected)
+    {
+        Serial.println("Connected to Wi-Fi!");
+        digitalWrite(greenl, HIGH); // Turn on green LED to indicate connection
+        delay(2000);
+        digitalWrite(greenl, LOW);   // Turn off red LED
+        delay(500);
+    }
+    else
+    {
+        Serial.println("Failed to connect to Wi-Fi.");
+        digitalWrite(redl, HIGH); // Keep red LED on to indicate failure
+        delay(2000);
+        digitalWrite(greenl, LOW);
+        delay(500); // Turn off green LED
+    }
+
+    // Button setup
+    pinMode(BUTTON_SEND, INPUT);
+    pinMode(BUTTON_CALL, INPUT);
 }
 
 void loop()
 {
-    // Logic from the second code
+    // GPS data processing
     while (neogps.available() > 0)
     {
         gps.encode(neogps.read());
@@ -125,7 +168,7 @@ void loop()
             if (WiFi.status() == WL_CONNECTED)
             {
                 HTTPClient http;
-                http.begin(wifiClientSecure, serverUrl);
+                http.begin(wifiClient, serverUrl); // Use the WiFiClient object here
                 http.addHeader("Content-Type", "application/json");
 
                 String jsonData = "{";
@@ -155,18 +198,27 @@ void loop()
             {
                 Serial.println("Wi-Fi disconnected!");
             }
-
-            delay(10000); // Send data every 10 seconds
         }
     }
 
-    // Call the function from the first code to send an SMS
-    sendLocation(PHONE_NUMBER);
-    makeCall(PHONE_NUMBER);
+    // Check button states
+    if (digitalRead(BUTTON_SEND) == HIGH) // Button pressed (active LOW)
+    {
+        sendLocation(PHONE_NUMBER);
+        delay(1000); // Debounce delay
+    }
+
+    if (digitalRead(BUTTON_CALL) == HIGH) // Button pressed (active LOW)
+    {
+        makeCall(PHONE_NUMBER);
+        delay(1000); // Debounce delay
+    }
 }
 
+// The sendLocation and Reply functions remain unchanged
 void sendLocation(String phoneNumber)
 {
+    digitalWrite(redl,HIGH);
     boolean newData = false;
     for (unsigned long start = millis(); millis() - start < 10000;)
     {
@@ -206,7 +258,15 @@ void Reply(String text, String Phone)
     delay(100);
     sim800.write(0x1A);
     delay(1000);
+    digitalWrite(redl,LOW);
+    digitalWrite(greenl,HIGH);
     Serial.println("SMS Sent Successfully.");
+    delay(2000);
+    digitalWrite(greenl,LOW);
+    smsStatus = "";
+    senderNumber = "";
+    receivedDate = "";
+    msg = "";
 }
 
 void debugPrint(String text)
@@ -214,13 +274,25 @@ void debugPrint(String text)
     if (DEBUG_MODE == 1)
         Serial.println(text);
 }
-void makeCall(String phoneNumber)
-{
+
+void makeCall(String phoneNumber) {
     sim800.print("ATD");
     sim800.print(phoneNumber);
     sim800.println(";");
-    delay(10000); // Keep the call active for 10 seconds
+    unsigned long startTime = millis();
+    // digitalWrite(greenl,HIGH);
+    // delay(7000);
+    // digitalWrite(greenl,LOW);
+
+    while (millis() - startTime < 16000) { // Keep the call active for 16 seconds
+        digitalWrite(greenl, HIGH);
+        delay(50); // Short delay to allow background tasks
+        digitalWrite(greenl, LOW);
+        delay(50);
+        yield(); // Reset the WDT and handle background tasks
+    }
+
     sim800.println("ATH"); // Hang up the call
     delay(1000);
-    Serial.println("Call made and ended.");
+    Serial.println("Call made .");
 }

@@ -37,8 +37,8 @@ This project is a GPS tracker that uses the **ESP8266 Wi-Fi module**, **NEO-6M G
 ```
 Main Folder
 │
-├── Final_without_pushButton/
-│   └── Final_without_pushButton.ino           # Code for sending GMT time, lat, long and location data Via sms without push button.
+├── Final/
+│   └── Final_code.ino                         # Code for sending location data to Website and sending location Via sms by push button and Emergency calling function.
 |
 ├── GMT/
 │   └── GMT.ino                                # Code for sending GMT time, lat, long, etc to the server.
@@ -50,8 +50,8 @@ Main Folder
 │   └── sendLocation.ino                       # Code for sending GMT time, lat, long, via sms ony.
 │
 ├── Webpage/
-│   └── frontend/               # Frontend code for the web interface
-│   └── backend/                # Backend code for the web server
+│   └── frontend/                              # Frontend code for the web interface
+│   └── backend/                               # Backend code for the web server
 ```
 
 ---

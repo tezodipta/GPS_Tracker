@@ -15,6 +15,9 @@ app.post('/location', (req, res) => {
   res.send('Location data received!');
 });
 
+app.get('/',(req,res) => {
+  res.send('Hello World');
+});
 app.get('/location', (req, res) => {
   res.json(locationData);
 });
