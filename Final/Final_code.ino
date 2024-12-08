@@ -126,6 +126,7 @@ void loop()
 
     if (gps.location.isUpdated())
     {
+        ESP.wdtDisable();
         double latitude = gps.location.lat();
         double longitude = gps.location.lng();
         double altitude = gps.altitude.meters();
@@ -204,12 +205,14 @@ void loop()
     // Check button states
     if (digitalRead(BUTTON_SEND) == HIGH) // Button pressed (active LOW)
     {
+        hw_wdt_disable();
         sendLocation(PHONE_NUMBER);
         delay(1000); // Debounce delay
     }
 
     if (digitalRead(BUTTON_CALL) == HIGH) // Button pressed (active LOW)
     {
+        hw_wdt_disable();
         makeCall(PHONE_NUMBER);
         delay(1000); // Debounce delay
     }
@@ -295,4 +298,11 @@ void makeCall(String phoneNumber) {
     sim800.println("ATH"); // Hang up the call
     delay(1000);
     Serial.println("Call made .");
+}
+void hw_wdt_disable(){
+  *((volatile uint32_t*) 0x60000900) &= ~(1); // Hardware WDT OFF
+}
+
+void hw_wdt_enable(){
+  *((volatile uint32_t*) 0x60000900) |= 1; // Hardware WDT ON
 }
