@@ -5,8 +5,8 @@
 #include <SoftwareSerial.h>
 
 // Wi-Fi credentials
-const char *ssid = "Tezodipta";
-const char *password = "ykqb6512";
+const char *ssid = "";
+const char *password = "";
 
 // Server URL
 const char *serverUrl = "http://SERVER-IP/location"; // HTTP API URL or IP address
